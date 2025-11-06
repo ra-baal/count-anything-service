@@ -1,5 +1,4 @@
 import express from "express";
-import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("ts-node/esm", pathToFileURL("./"));';
 const app = express();
 app.get("/", (req, res) => {
     res.send("Service is running");

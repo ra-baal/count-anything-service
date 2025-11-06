@@ -1,31 +1,10 @@
-# Express.js on Vercel
+# Installation
 
-Basic Express.js + Vercel example that serves html content, JSON data and simulates an api route.
+- Clone the repo: git clone <your-repo-url>
+- Go to folder: cd count-anything-service
+- Install dependencies: npm install
 
-## How to Use
+# Development
 
-You can choose from one of the following two methods to use this repository:
-
-### One-Click Deploy
-
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=vercel-examples):
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/vercel/examples/tree/main/solutions/express&project-name=express&repository-name=express)
-
-### Clone and Deploy
-
-```bash
-git clone https://github.com/vercel/examples/tree/main/solutions/express
-```
-
-Install the Vercel CLI:
-
-```bash
-npm i -g vercel
-```
-
-Then run the app at the root of the repository:
-
-```bash
-vercel dev
-```
+- Run locally: `npm run dev` or
+- Run with Vercel dev server: `npm run vercel-dev`
