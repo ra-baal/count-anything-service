@@ -1,56 +1,22 @@
 import express from "express";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
+
+app.get("/", (req, res) => {
+  res.send("Service is running");
+});
 
 app.get("/hello", (req, res) => {
   res.send("Hello World");
 });
 
-// Home route - HTML
-app.get("/", (req, res) => {
-  res.type("html").send(`
-    <!doctype html>
-    <html>
-      <head>
-        <meta charset="utf-8"/>
-        <title>Express on Vercel</title>
-        <link rel="stylesheet" href="/style.css" />
-      </head>
-      <body>
-        <nav>
-          <a href="/">Home</a>
-          <a href="/about">About</a>
-          <a href="/api-data">API Data</a>
-          <a href="/healthz">Health</a>
-        </nav>
-        <h1>Welcome to Express on Vercel 🚀</h1>
-        <p>This is a minimal example without a database or forms.</p>
-        <img src="/logo.png" alt="Logo" width="120" />
-      </body>
-    </html>
-  `);
-});
+// Only start listening if not in Vercel (serverless).
+if (process.env.VERCEL !== "1") {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () =>
+    console.log(`\nRunning at http://localhost:${PORT}\n`)
+  );
+}
 
-app.get("/about", function (req, res) {
-  res.sendFile(path.join(__dirname, "..", "components", "about.htm"));
-});
-
-// Example API endpoint - JSON
-app.get("/api-data", (req, res) => {
-  res.json({
-    message: "Here is some sample API data",
-    items: ["apple", "banana", "cherry"],
-  });
-});
-
-// Health check
-app.get("/healthz", (req, res) => {
-  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
-});
-
+// For Vercel.
 export default app;
