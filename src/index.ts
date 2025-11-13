@@ -27,6 +27,10 @@ if (process.env.VERCEL !== "1") {
   );
 }
 
+app.get("/test", (req, res) => {
+  res.send("test");
+});
+
 // [serverless]
 // For Vercel.
 export default app;
