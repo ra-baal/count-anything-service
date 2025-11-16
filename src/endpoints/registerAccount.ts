@@ -7,15 +7,19 @@ type CreateAccountModel = {
 
 function isReqBodyCAM(obj: any): obj is CreateAccountModel {
     return (
-        obj !== null &&
+        typeof obj == 'object' && obj !== null &&
         typeof obj.email === 'string' &&
-        typeof obj.password === 'string' &&
-        Object.keys(obj).length === 2
+        typeof obj.password === 'string'
     );
 }
 
+function isValidEmail(email: string): boolean {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return regex.test(email);
+}
+
 export async function registerAccount(req, res) {
-    //TODO: Improve
+    //Check if request send valid data
     if (!isReqBodyCAM(req.body)) {
         return res.status(400).json({ 
             error: 'Invalid request body. Expected: { email: string, password: string }' 
@@ -23,11 +27,11 @@ export async function registerAccount(req, res) {
     }
     const account: CreateAccountModel = req.body;
 
-    //TODO: Validate
-    if (account.email === null || account.password === null)
-        return res.status(400);
+    //Validate data
+    if (account.email === null || account.password === null) return res.status(400);
+    else if (!isValidEmail(account.email)) return res.status(400);
 
     //TODO: Push to DB
-
-    return res.status(200).send(account);
+    
+    return res.status(204);
 }
