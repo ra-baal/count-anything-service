@@ -1,4 +1,4 @@
-import { response } from "express"
+import { insertAccount } from "../database.js";
 
 type CreateAccountModel = {
     email: string,
@@ -31,7 +31,9 @@ export async function registerAccount(req, res) {
     if (account.email === null || account.password === null) return res.status(400);
     else if (!isValidEmail(account.email)) return res.status(400);
 
-    //TODO: Push to DB
-    
-    return res.status(204);
+    //TODO: Hash password
+
+    //Push to DB
+    const accountId = await insertAccount(account.email, account.password);
+    return res.status(200).json({id: accountId});
 }
