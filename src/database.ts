@@ -16,3 +16,19 @@ export async function dbTime() {
   const [row] = await sql`SELECT now() AS time`;
   return row.time;
 }
+
+export async function insertAccount(email: string, passwordHash: string) {
+  const [accountResult] = await sql`
+    INSERT INTO accounts (email)
+    VALUES (${email})
+    RETURNING id`;
+  
+  const accountId = accountResult.id;
+  
+  await sql`
+    INSERT INTO passwords (accountid, hashedvalue)
+    VALUES (${accountId}, ${passwordHash})
+  `;
+  
+  return accountId;
+}

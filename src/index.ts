@@ -1,7 +1,9 @@
 import express from "express";
 import { dbTime, dbVersion } from "./database.js";
+import { registerAccount } from "./endpoints/registerAccount.js";
 
 const app = express();
+app.use(express.json());
 
 app.get("/", async (req, res) => {
   res.send("Service is running");
@@ -17,6 +19,8 @@ app.get("/db-test", async (req, res) => {
   console.log(version, time);
   res.json({ version: version, time: time });
 });
+
+app.post("/account/register", registerAccount);
 
 // [server]
 // Only start listening if not in Vercel.
