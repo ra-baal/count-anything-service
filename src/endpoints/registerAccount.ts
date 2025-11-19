@@ -1,6 +1,7 @@
 import { NeonDbError } from "@neondatabase/serverless";
 import { insertAccount } from "../database.js";
 import { hash, verify } from "argon2"
+import { emailRegex } from "../common/regex.js";
 
 const invalidRequestError = 'Invalid request body. Expected: { email: string, password: string }';
 
@@ -18,8 +19,7 @@ function isReqBodyCAM(obj: any): obj is CreateAccountModel {
 }
 
 function isValidEmail(email: string): boolean {
-    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return regex.test(email);
+    return emailRegex.test(email);
 }
 
 export async function registerAccount(req, res) {
