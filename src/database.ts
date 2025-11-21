@@ -18,17 +18,33 @@ export async function dbTime() {
 }
 
 export async function insertAccount(email: string, passwordHash: string) {
-  const [accountResult] = await sql`
-    INSERT INTO accounts (email)
-    VALUES (${email})
-    RETURNING id`;
+  const sqlFunction = async () => {
+    const [accountResult] = await sql`
+      INSERT INTO accounts (email)
+      VALUES (${email})
+      RETURNING id`;
   
-  const accountId = accountResult.id;
+    const accountId = accountResult.id;
   
-  await sql`
-    INSERT INTO passwords (accountid, hashedvalue)
-    VALUES (${accountId}, ${passwordHash})
-  `;
+    await sql`
+      INSERT INTO passwords (accountid, hashedvalue)
+      VALUES (${accountId}, ${passwordHash})`;
   
-  return accountId;
+    return accountId;
+  }
+
+  return createTransaction(sqlFunction);
+}
+
+async function createTransaction<T>(fn: () => Promise<T>): Promise<T> {
+  await sql`BEGIN;`;
+  try {
+    // Run sql function
+    const result = await fn();
+    await sql`COMMIT;`;
+    return result;
+  } catch (err) {
+    await sql`ROLLBACK;`;
+    throw err;
+  }
 }
