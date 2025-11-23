@@ -1,6 +1,12 @@
 import express from "express";
 import { dbTime, dbVersion } from "./database.js";
 import { registerAccount } from "./endpoints/registerAccount.js";
+import { getCounters } from "./endpoints/counters/getCounters.js";
+import { createCounter } from "./endpoints/counters/createCounter.js";
+import { incrementCounter } from "./endpoints/counters/incrementCounter.js";
+import { decrementCounter } from "./endpoints/counters/decrementCounter.js";
+import { deleteCounter } from "./endpoints/counters/deleteCounter.js";
+import { resetCounter } from "./endpoints/counters/resetCounter.js";
 
 const app = express();
 app.use(express.json());
@@ -30,6 +36,13 @@ if (process.env.VERCEL !== "1") {
     console.log(`\nRunning at http://localhost:${PORT}\n`)
   );
 }
+
+app.get("/counters", getCounters);
+app.post("/counters", createCounter);
+app.post("/counters/:id/increment", incrementCounter);
+app.post("/counters/:id/decrement", decrementCounter);
+app.post("/counters/:id/reset", resetCounter);
+app.delete("/counters/:id/delete", deleteCounter);
 
 app.get("/test", (req, res) => {
   res.send("test");
