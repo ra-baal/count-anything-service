@@ -1,6 +1,5 @@
 import type { Request, Response } from "express";
-import type { Counter } from "../../common/counter.js";
-import { sql } from "../../database.js";
+import { counterQueries } from "../../infrastructure/queries/counterQueries.js";
 
 export async function createCounter(req: Request, res: Response) {
   const { name } = req.body;
@@ -10,11 +9,7 @@ export async function createCounter(req: Request, res: Response) {
   }
 
   try {
-    const [counter] = (await sql`
-      INSERT INTO counters (name, value) 
-      VALUES (${name},0)
-      RETURNING id, name, value 
-    `) as Counter[];
+    const counter = await counterQueries.create(name);
 
     res.status(201).json(counter);
   } catch (error) {

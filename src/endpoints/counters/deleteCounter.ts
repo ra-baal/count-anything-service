@@ -1,18 +1,11 @@
 import type { Request, Response } from "express";
-import type { Counter } from "../../common/counter.js";
-import { sql } from "../../database.js";
-
-type CounterId = Pick<Counter, "id">;
+import { counterQueries } from "../../infrastructure/queries/counterQueries.js";
 
 export async function deleteCounter(req: Request, res: Response) {
   const { id } = req.params;
 
   try {
-    const deletedId = (await sql`
-      DELETE FROM counters
-      WHERE id = ${id}
-      RETURNING id
-  `) as CounterId[];
+    const deletedId = await counterQueries.delete(id);
 
     if (!deletedId) {
       res.status(404).json({ error: `Counter with id: ${id} not found` });

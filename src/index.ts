@@ -1,5 +1,5 @@
 import express from "express";
-import { dbTime, dbVersion } from "./database.js";
+import { dbTime, dbVersion } from "./infrastructure/queries/systemQueries.js";
 import { registerAccount } from "./endpoints/registerAccount.js";
 import { getCounters } from "./endpoints/counters/getCounters.js";
 import { createCounter } from "./endpoints/counters/createCounter.js";
