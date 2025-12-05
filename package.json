@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "dev": "node --loader ts-node/esm src/index.ts",
-    "vercel-dev": "vercel dev"
+    "dev": "tsc --noEmit && node --loader ts-node/esm src/index.ts",
+    "vercel-dev": "vercel dev",
+    "build": "tsc"
   },
   "type": "module",
   "keywords": [],

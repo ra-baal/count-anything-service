@@ -1,17 +1,11 @@
 import type { Request, Response } from "express";
-import type { Counter } from "../../common/counter.js";
-import { sql } from "../../database.js";
+import { counterQueries } from "../../infrastructure/queries/counterQueries.js";
 
 export async function decrementCounter(req: Request, res: Response) {
   const { id } = req.params;
 
   try {
-    const [updatedCounter] = (await sql`
-      UPDATE counters
-      SET value = GREATEST(value - 1, 0)
-      WHERE id = ${id}
-      RETURNING *
-    `) as Counter[];
+    const updatedCounter = await counterQueries.decrement(id);
 
     if (!updatedCounter) {
       res.status(404).json({ error: `Counter with id: ${id} not found` });
