@@ -1,12 +1,9 @@
 import type { Request, Response } from "express";
-import type { Counter } from "../../common/counter.js";
-import { sql } from "../../database.js";
+import { counterQueries } from "../../infrastructure/queries/counterQueries.js";
 
 export async function getCounters(req: Request, res: Response) {
   try {
-    const counters = (await sql`
-    SELECT * FROM counters 
-    ORDER BY id ASC`) as Counter[];
+    const counters = await counterQueries.getAll();
 
     if (counters.length === 0) {
       return res.status(404).json({ error: "No counters found" });
