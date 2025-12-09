@@ -1,6 +1,6 @@
 import express from "express";
 import { dbTime, dbVersion } from "./infrastructure/queries/systemQueries.js";
-import { registerAccount } from "./endpoints/registerAccount.js";
+import { registerAccount } from "./endpoints/accounts/registerAccount.js";
 import { getCounters } from "./endpoints/counters/getCounters.js";
 import { createCounter } from "./endpoints/counters/createCounter.js";
 import { incrementCounter } from "./endpoints/counters/incrementCounter.js";
@@ -28,6 +28,13 @@ app.get("/db-test", async (req, res) => {
 
 app.post("/account/register", registerAccount);
 
+app.get("/counters", getCounters);
+app.post("/counters", createCounter);
+app.post("/counters/:id/increment", incrementCounter);
+app.post("/counters/:id/decrement", decrementCounter);
+app.post("/counters/:id/reset", resetCounter);
+app.delete("/counters/:id/delete", deleteCounter);
+
 // [server]
 // Only start listening if not in Vercel.
 if (process.env.VERCEL !== "1") {
@@ -36,17 +43,6 @@ if (process.env.VERCEL !== "1") {
     console.log(`\nRunning at http://localhost:${PORT}\n`)
   );
 }
-
-app.get("/counters", getCounters);
-app.post("/counters", createCounter);
-app.post("/counters/:id/increment", incrementCounter);
-app.post("/counters/:id/decrement", decrementCounter);
-app.post("/counters/:id/reset", resetCounter);
-app.delete("/counters/:id/delete", deleteCounter);
-
-app.get("/test", (req, res) => {
-  res.send("test");
-});
 
 // [serverless]
 // For Vercel.
