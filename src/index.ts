@@ -1,12 +1,7 @@
 import express from "express";
 import { dbTime, dbVersion } from "./infrastructure/queries/systemQueries.js";
-import { registerAccount } from "./endpoints/accounts/registerAccount.js";
-import { getCounters } from "./endpoints/counters/getCounters.js";
-import { createCounter } from "./endpoints/counters/createCounter.js";
-import { incrementCounter } from "./endpoints/counters/incrementCounter.js";
-import { decrementCounter } from "./endpoints/counters/decrementCounter.js";
-import { deleteCounter } from "./endpoints/counters/deleteCounter.js";
-import { resetCounter } from "./endpoints/counters/resetCounter.js";
+import accountsRouter from "./endpoints/accounts/accountsRouter.js";
+import countersRouter from "./endpoints/counters/countersRouter.js";
 
 const app = express();
 app.use(express.json());
@@ -26,14 +21,9 @@ app.get("/db-test", async (req, res) => {
   res.json({ version: version, time: time });
 });
 
-app.post("/account/register", registerAccount);
+app.use("/account", accountsRouter);
 
-app.get("/counters", getCounters);
-app.post("/counters", createCounter);
-app.post("/counters/:id/increment", incrementCounter);
-app.post("/counters/:id/decrement", decrementCounter);
-app.post("/counters/:id/reset", resetCounter);
-app.delete("/counters/:id/delete", deleteCounter);
+app.use("/counters", countersRouter);
 
 // [server]
 // Only start listening if not in Vercel.
