@@ -1,6 +1,6 @@
 import express from "express";
 import { dbTime, dbVersion } from "./infrastructure/queries/systemQueries.js";
-import { registerAccount } from "./endpoints/accounts/registerAccount.js";
+import accountsRouter from "./endpoints/accounts/accountsRouter.js";
 import countersRouter from "./endpoints/counters/countersRouter.js";
 
 const app = express();
@@ -21,7 +21,7 @@ app.get("/db-test", async (req, res) => {
   res.json({ version: version, time: time });
 });
 
-app.post("/account/register", registerAccount);
+app.use("/account", accountsRouter);
 
 app.use("/counters", countersRouter);
 
