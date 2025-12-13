@@ -7,9 +7,12 @@ import { incrementCounter } from "./endpoints/counters/incrementCounter.js";
 import { decrementCounter } from "./endpoints/counters/decrementCounter.js";
 import { deleteCounter } from "./endpoints/counters/deleteCounter.js";
 import { resetCounter } from "./endpoints/counters/resetCounter.js";
+import { loginAccount } from "./endpoints/accounts/loginAccount.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 app.get("/", async (req, res) => {
   res.send("Service is running");
@@ -27,6 +30,7 @@ app.get("/db-test", async (req, res) => {
 });
 
 app.post("/account/register", registerAccount);
+app.post("/auth/login", loginAccount);
 
 app.get("/counters", getCounters);
 app.post("/counters", createCounter);

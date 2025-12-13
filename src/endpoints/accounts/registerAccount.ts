@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { NeonDbError } from "@neondatabase/serverless";
-import { insertAccount } from "../../infrastructure/queries/accountQueries.js";
+import { accountQueries } from "../../infrastructure/queries/accountQueries.js";
 import { hash } from "argon2";
 import * as zod from "zod";
 
@@ -29,7 +29,7 @@ export async function registerAccount(req: Request, res: Response) {
     newAccount.password = await hash(newAccount.password);
 
     //Push to DB
-    const accountId = await insertAccount(newAccount.email, newAccount.password);
+    const accountId = await accountQueries.register(newAccount.email, newAccount.password);
     return res.status(200).json({ id: accountId });
   } catch (err) {
     if (err instanceof NeonDbError)

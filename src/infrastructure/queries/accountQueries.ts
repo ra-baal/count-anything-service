@@ -1,6 +1,6 @@
 import { sql } from "../database.js";
 
-export async function insertAccount(email: string, passwordHash: string) {
+async function insertAccount(email: string, passwordHash: string) {
   // W srodowisku serverless nie mozna polegac na tradycyjnych transakcjach,
   // dlatego uzywamy jednego atomowego zapytania, ktore tworzy konto i haslo w spojny sposob.
   const [result] = await sql`
@@ -16,3 +16,19 @@ export async function insertAccount(email: string, passwordHash: string) {
 
   return result.id;
 }
+
+async function getLoginCredential(email: string): Promise<string[]> {
+  const [result] = await sql`
+    SELECT pass.accountid, pass.hashedvalue FROM accounts
+      JOIN passwords AS pass ON accounts.id = pass.accountid
+      WHERE email = ${email}
+      FETCH FIRST 1 ROWS ONLY;`;
+
+  if (result == null) throw new Error("empty");
+  return [result.accountid, result.hashedvalue];
+}
+
+export const accountQueries = {
+  register: insertAccount,
+  login: getLoginCredential
+};
