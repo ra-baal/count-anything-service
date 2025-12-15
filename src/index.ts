@@ -1,9 +1,31 @@
 import express from "express";
+import cors from "cors";
 import { dbTime, dbVersion } from "./infrastructure/queries/systemQueries.js";
 import accountsRouter from "./endpoints/accounts/accountsRouter.js";
 import countersRouter from "./endpoints/counters/countersRouter.js";
 
 const app = express();
+
+const allowedOrigins =
+  process.env.CORS_ALLOWED_ORIGINS?.split(",").map(
+    (x) => x.trim().replace(/\/$/, "") // trim whitespace and trailing slash
+  ) ?? [];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // allow requests with no origin (like Postman or server-side requests)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS not allowed"));
+      }
+    },
+    methods: "GET,POST,PUT,DELETE,OPTIONS",
+    allowedHeaders: "Content-Type, Authorization",
+  })
+);
+
 app.use(express.json());
 
 app.get("/", async (req, res) => {
