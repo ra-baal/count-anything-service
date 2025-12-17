@@ -2,16 +2,11 @@ import express from "express";
 import cors from "cors";
 import { dbTime, dbVersion } from "./infrastructure/queries/systemQueries.js";
 import { registerAccount } from "./endpoints/accounts/registerAccount.js";
-import { getCounters } from "./endpoints/counters/getCounters.js";
-import { createCounter } from "./endpoints/counters/createCounter.js";
-import { incrementCounter } from "./endpoints/counters/incrementCounter.js";
-import { decrementCounter } from "./endpoints/counters/decrementCounter.js";
-import { deleteCounter } from "./endpoints/counters/deleteCounter.js";
-import { resetCounter } from "./endpoints/counters/resetCounter.js";
 import { loginAccount } from "./endpoints/accounts/loginAccount.js";
 import cookieParser from "cookie-parser";
 import { logoutAccount } from "./endpoints/accounts/logoutAccount.js";
 import { getInfoAccount } from "./endpoints/accounts/infoAccount.js";
+import countersRouter from "./endpoints/counters/countersRouter.js";
 
 const app = express();
 
