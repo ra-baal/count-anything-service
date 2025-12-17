@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import { logoutAccount } from "./endpoints/accounts/logoutAccount.js";
 import { getInfoAccount } from "./endpoints/accounts/infoAccount.js";
 import countersRouter from "./endpoints/counters/countersRouter.js";
+import accountsRouter from "./endpoints/accounts/accountsRouter.js";
 
 const app = express();
 
@@ -48,11 +49,11 @@ app.get("/db-test", async (req, res) => {
   res.json({ version: version, time: time });
 });
 
-app.post("/account/register", registerAccount);
 app.post("/auth/login", loginAccount);
 app.get("/auth/logout", logoutAccount);
 app.get("/auth/me", getInfoAccount);
 
+app.use("/accounts", accountsRouter);
 app.use("/counters", countersRouter);
 
 // [server]
