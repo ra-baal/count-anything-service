@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import { dbTime, dbVersion } from "./infrastructure/queries/systemQueries.js";
 import { registerAccount } from "./endpoints/accounts/registerAccount.js";
 import { getCounters } from "./endpoints/counters/getCounters.js";
@@ -13,6 +14,27 @@ import { logoutAccount } from "./endpoints/accounts/logoutAccount.js";
 import { getInfoAccount } from "./endpoints/accounts/infoAccount.js";
 
 const app = express();
+
+const allowedOrigins =
+  process.env.CORS_ALLOWED_ORIGINS?.split(",").map(
+    (x) => x.trim().replace(/\/$/, "") // trim whitespace and trailing slash
+  ) ?? [];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // allow requests with no origin (like Postman or server-side requests)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS not allowed"));
+      }
+    },
+    methods: "GET,POST,PUT,DELETE,OPTIONS",
+    allowedHeaders: "Content-Type, Authorization",
+  })
+);
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -36,12 +58,7 @@ app.post("/auth/login", loginAccount);
 app.get("/auth/logout", logoutAccount);
 app.get("/auth/me", getInfoAccount);
 
-app.get("/counters", getCounters);
-app.post("/counters", createCounter);
-app.post("/counters/:id/increment", incrementCounter);
-app.post("/counters/:id/decrement", decrementCounter);
-app.post("/counters/:id/reset", resetCounter);
-app.delete("/counters/:id/delete", deleteCounter);
+app.use("/counters", countersRouter);
 
 // [server]
 // Only start listening if not in Vercel.
