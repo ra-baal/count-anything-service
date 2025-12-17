@@ -1,8 +1,17 @@
 import express from "express";
 import cors from "cors";
 import { dbTime, dbVersion } from "./infrastructure/queries/systemQueries.js";
-import accountsRouter from "./endpoints/accounts/accountsRouter.js";
-import countersRouter from "./endpoints/counters/countersRouter.js";
+import { registerAccount } from "./endpoints/accounts/registerAccount.js";
+import { getCounters } from "./endpoints/counters/getCounters.js";
+import { createCounter } from "./endpoints/counters/createCounter.js";
+import { incrementCounter } from "./endpoints/counters/incrementCounter.js";
+import { decrementCounter } from "./endpoints/counters/decrementCounter.js";
+import { deleteCounter } from "./endpoints/counters/deleteCounter.js";
+import { resetCounter } from "./endpoints/counters/resetCounter.js";
+import { loginAccount } from "./endpoints/accounts/loginAccount.js";
+import cookieParser from "cookie-parser";
+import { logoutAccount } from "./endpoints/accounts/logoutAccount.js";
+import { getInfoAccount } from "./endpoints/accounts/infoAccount.js";
 
 const app = express();
 
@@ -27,6 +36,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.get("/", async (req, res) => {
   res.send("Service is running");
@@ -43,7 +53,10 @@ app.get("/db-test", async (req, res) => {
   res.json({ version: version, time: time });
 });
 
-app.use("/account", accountsRouter);
+app.post("/account/register", registerAccount);
+app.post("/auth/login", loginAccount);
+app.get("/auth/logout", logoutAccount);
+app.get("/auth/me", getInfoAccount);
 
 app.use("/counters", countersRouter);
 
