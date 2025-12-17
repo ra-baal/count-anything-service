@@ -10,6 +10,7 @@ import { resetCounter } from "./endpoints/counters/resetCounter.js";
 import { loginAccount } from "./endpoints/accounts/loginAccount.js";
 import cookieParser from "cookie-parser";
 import { logoutAccount } from "./endpoints/accounts/logoutAccount.js";
+import { getInfoAccount } from "./endpoints/accounts/infoAccount.js";
 
 const app = express();
 app.use(express.json());
@@ -33,6 +34,7 @@ app.get("/db-test", async (req, res) => {
 app.post("/account/register", registerAccount);
 app.post("/auth/login", loginAccount);
 app.get("/auth/logout", logoutAccount);
+app.get("/auth/me", getInfoAccount);
 
 app.get("/counters", getCounters);
 app.post("/counters", createCounter);
