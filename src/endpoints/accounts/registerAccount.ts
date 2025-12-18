@@ -7,9 +7,7 @@ import { z } from "zod";
 export const minPasswordLength = 9;
 
 const AccountModel = z.object({
-  email: z
-    .email({ message: "Podaj poprawny adres email" })
-    .min(1, "Email jest wymagany"),
+  email: z.email({ message: "Podaadres email" }).min(1, "Email jest wymagany"),
 
   password: z
     .string()
@@ -17,7 +15,7 @@ const AccountModel = z.object({
       minPasswordLength,
       `Hasło musi mieć co najmniej ${minPasswordLength} znaków`
     )
-    .regex(/[A-Z]/, "Hasło musi zawierać przynajmniej jedną wielką literę")
+    .regex(/[A-Z]/, "Hasło musej jedną wielką literę")
     .regex(/\d/, "Hasło musi zawierać przynajmniej jedną cyfrę"),
 });
 
