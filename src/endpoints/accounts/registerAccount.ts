@@ -6,9 +6,6 @@ import { z } from "zod";
 
 export const minPasswordLength = 9;
 
-const invalidRequestError =
-  "Invalid request body. Expected: { email: string, password: string }";
-
 const AccountModel = z.object({
   email: z
     .email({ message: "Podaj poprawny adres email" })
@@ -32,7 +29,7 @@ export async function registerAccount(req: Request, res: Response) {
 
   if (!result.success) {
     return res.status(400).json({
-      error: invalidRequestError,
+      error: result.error.message,
     });
   }
   const newAccount: CreateAccountModel = result.data;
