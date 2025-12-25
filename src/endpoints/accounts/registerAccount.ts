@@ -6,6 +6,8 @@ import * as zod from "zod";
 
 const invalidRequestError =
   "Invalid request body. Expected: { email: string, password: string }";
+const dbError =
+    "Inner error during connection with Database";
 
 const AccountModel = zod.object({
     email: zod.email(),
@@ -33,7 +35,7 @@ export async function registerAccount(req: Request, res: Response) {
     return res.status(200).json({ id: accountId });
   } catch (err) {
     if (err instanceof NeonDbError)
-      return res.status(500).json({ error: err.detail });
+      return res.status(500).json({ error: dbError });
     else throw err;
   }
 }
