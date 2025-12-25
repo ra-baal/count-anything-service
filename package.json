@@ -24,8 +24,8 @@
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.10",
-    "@types/jsonwebtoken": "^9.0.10",
     "@types/cors": "^2.8.19",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"

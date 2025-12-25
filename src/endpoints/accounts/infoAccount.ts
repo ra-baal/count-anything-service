@@ -3,6 +3,7 @@ import type { Request, Response } from "express";
 import { console } from "inspector";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { accountQueries } from "../../infrastructure/queries/accountQueries.js";
+import { decodeToken } from "../../common/tokenService.js";
 
 const invalidTokenError =
     "Invalid access_token in cookies data";
@@ -17,14 +18,9 @@ export async function getInfoAccount(req: Request, res: Response) {
     if (!access_token)
         return res.status(401).json({ error: noTokenRequestError});
 
-    const secretKey = process.env.COUNT_ANYTHING_TOKEN_SECRET_KEY;
-    if (!secretKey) {
-        throw new Error("COUNT_ANYTHING_TOKEN_SECRET_KEY environment variable is not defined");
-    }
-
     try {
         //Decrypt token
-        const decryptedToken = jwt.verify(access_token, secretKey);
+        const decryptedToken = decodeToken(access_token);
         if (typeof(decryptedToken) === "string")
             return res.status(400).json({ error: invalidTokenError });
         const { email } = decryptedToken;
