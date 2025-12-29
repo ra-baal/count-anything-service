@@ -4,6 +4,7 @@ import { verify } from "argon2";
 import * as zod from "zod";
 import { accountQueries } from "../../infrastructure/queries/accountQueries.js";
 import jwt from "jsonwebtoken";
+import { generateAuthKey } from "../../common/tokenService.js";
 
 const invalidRequestError =
     "Invalid request body. Expected: { email: string, password: string }";
@@ -36,20 +37,8 @@ export async function loginAccount(req: Request, res: Response) {
         if ((!await verify(hashedValue, newAccount.password))) {
             return res.status(400).json({ error: noaccountRequestError });
         }
-
-        //Creating JWT Token
-        const secretKey = process.env.COUNT_ANYTHING_TOKEN_SECRET_KEY;
-        if (!secretKey) {
-            throw new Error("COUNT_ANYTHING_TOKEN_SECRET_KEY environment variable is not defined");
-        }
-
-        const { sign } = jwt;
-        const access_token = sign({
-            userId: accountId,
-            email: newAccount.email
-        },
-            secretKey,
-            { expiresIn: "1h" });
+        
+        const access_token = generateAuthKey(accountId, newAccount.email);
 
         //Return data and send token as cookie
         return res.status(200).cookie("access_token", access_token, { httpOnly: true, secure: true, sameSite: "strict" }).json({
