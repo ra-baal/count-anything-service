@@ -9,6 +9,8 @@ const invalidRequestError =
     "Invalid request body. Expected: { email: string, password: string }";
 const noaccountRequestError =
     "There is no account with that email and password";
+const dbError =
+    "Inner error during connection with Database";
 
 const AccountModel = zod.object({
     email: zod.email(),
@@ -42,7 +44,7 @@ export async function loginAccount(req: Request, res: Response) {
         }
 
         const { sign } = jwt;
-        const token = sign({
+        const access_token = sign({
             userId: accountId,
             email: newAccount.email
         },
@@ -50,17 +52,16 @@ export async function loginAccount(req: Request, res: Response) {
             { expiresIn: "1h" });
 
         //Return data and send token as cookie
-        return res.status(200).cookie("token", token).json({
+        return res.status(200).cookie("access_token", access_token, { httpOnly: true, secure: true, sameSite: "strict" }).json({
             userId: accountId,
-            email: newAccount.email,
-            token: token
+            email: newAccount.email
         });
     } catch (err) {
         //Check if account exist
         if (err instanceof Error && err.message == "empty")
             return res.status(400).json({ error: noaccountRequestError });
         else if (err instanceof NeonDbError)
-            return res.status(500).json({ error: err.detail });
+            return res.status(500).json({ error: dbError });
         else throw err;
     }
 }

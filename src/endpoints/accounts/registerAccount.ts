@@ -4,6 +4,10 @@ import { accountQueries } from "../../infrastructure/queries/accountQueries.js";
 import { hash } from "argon2";
 import { z } from "zod";
 
+const invalidRequestError =
+  "Invalid request body. Expected: { email: string, password: string }";
+const dbError =
+    "Inner error during connection with Database";
 export const minPasswordLength = 9;
 
 const AccountModel = z.object({
@@ -46,7 +50,7 @@ export async function registerAccount(req: Request, res: Response) {
     return res.status(200).json({ id: accountId });
   } catch (err) {
     if (err instanceof NeonDbError)
-      return res.status(500).json({ error: err.detail });
+      return res.status(500).json({ error: dbError });
     else throw err;
   }
 }
