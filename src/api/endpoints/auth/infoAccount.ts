@@ -1,0 +1,40 @@
+import { NeonDbError } from "@neondatabase/serverless";
+import type { Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import { accountQueries } from "../../../infrastructure/queries/accountQueries.js";
+import { decodeToken } from "../../../common/tokenService.js";
+import { newResponseSuccess } from "../../apiResponse.js";
+
+const invalidTokenError = "Invalid access_token in cookies data";
+const noTokenRequestError = "Token does not exist in cookies data";
+const dbError = "Inner error during connection with Database";
+
+export async function getInfoAccount(req: Request, res: Response) {
+  //Getting token from cookies
+  const { access_token } = req.cookies;
+  if (!access_token)
+    return res.status(401).json({ error: noTokenRequestError });
+
+  try {
+    //Decrypt token
+    const decryptedToken = decodeToken(access_token);
+    if (typeof decryptedToken === "string")
+      return res.status(400).json({ error: invalidTokenError });
+    const { email } = decryptedToken;
+
+    //Return account info
+    const accountInfo = await accountQueries.info(email);
+
+    const success = newResponseSuccess(accountInfo);
+    return res.status(200).json(success);
+  } catch (err) {
+    //Validate token
+    if (err instanceof jwt.JsonWebTokenError) {
+      return res.status(400).json({ error: invalidTokenError });
+    } else if (err instanceof Error && err.message == "empty")
+      return res.status(400).json({ error: invalidTokenError });
+    else if (err instanceof NeonDbError)
+      return res.status(500).json({ error: dbError });
+    else throw err;
+  }
+}

@@ -1,11 +1,11 @@
 import type { Request, Response } from "express";
-import { counterQueries } from "../../infrastructure/queries/counterQueries.js";
+import { counterQueries } from "../../../infrastructure/queries/counterQueries.js";
 
 export async function deleteCounter(req: Request, res: Response) {
   //Get userId from request
   const { userId } = req;
 
-  if (typeof(userId) === "undefined")
+  if (typeof userId === "undefined")
     return res.status(500).json({ error: "Internal pipeline error" });
 
   const { id } = req.params;

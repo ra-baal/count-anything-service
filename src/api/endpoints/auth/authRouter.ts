@@ -2,7 +2,7 @@ import { Router } from "express";
 import { loginAccount } from "./loginAccount.js";
 import { getInfoAccount } from "./infoAccount.js";
 import { logoutAccount } from "./logoutAccount.js";
-import { auth } from "../../infrastructure/middleware/authMiddleware.js";
+import { auth } from "../../middleware/authMiddleware.js";
 
 const router = Router();
 
