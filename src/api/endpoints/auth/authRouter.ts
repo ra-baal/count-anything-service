@@ -7,7 +7,7 @@ import { auth } from "../../middleware/authMiddleware.js";
 const router = Router();
 
 router.post("/login", loginAccount);
-router.get("/logout", logoutAccount);
+router.post("/logout", logoutAccount);
 router.get("/me", auth, getInfoAccount);
 
 export default router;
