@@ -5,7 +5,7 @@ import { incrementCounter } from "./incrementCounter.js";
 import { decrementCounter } from "./decrementCounter.js";
 import { deleteCounter } from "./deleteCounter.js";
 import { resetCounter } from "./resetCounter.js";
-import { auth } from "../../infrastructure/middleware/authMiddleware.js";
+import { auth } from "../../middleware/authMiddleware.js";
 
 const router = Router();
 

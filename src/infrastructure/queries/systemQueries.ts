@@ -5,7 +5,7 @@ export async function dbVersion() {
   return row.version;
 }
 
-export async function dbTime() {
+export async function dbTime(): Promise<Date> {
   const [row] = await sql`SELECT now() AS time`;
-  return row.time;
+  return new Date(row.time);
 }

@@ -1,13 +1,12 @@
 import type { Request, Response } from "express";
 import { NeonDbError } from "@neondatabase/serverless";
-import { accountQueries } from "../../infrastructure/queries/accountQueries.js";
+import { accountQueries } from "../../../infrastructure/queries/accountQueries.js";
 import { hash } from "argon2";
 import { z } from "zod";
 
 const invalidRequestError =
   "Invalid request body. Expected: { email: string, password: string }";
-const dbError =
-    "Inner error during connection with Database";
+const dbError = "Inner error during connection with Database";
 export const minPasswordLength = 9;
 
 const AccountModel = z.object({

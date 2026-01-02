@@ -6,7 +6,7 @@ type CounterId = { id: string };
 async function createCounter(name: string, userId: string): Promise<Counter> {
   const [counter] = (await sql`
     INSERT INTO counters (name, value, accountid)
-    VALUES (${name}, 0. ${userId})
+    VALUES (${name}, 0, ${userId})
     RETURNING id, name, value, accountid
   `) as Counter[];
   return counter;
