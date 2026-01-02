@@ -1,14 +1,10 @@
 import express, { Application } from "express";
 import cors from "cors";
 import { dbTime, dbVersion } from "./infrastructure/queries/systemQueries.js";
-import { registerAccount } from "./endpoints/accounts/registerAccount.js";
-import { loginAccount } from "./endpoints/accounts/loginAccount.js";
 import cookieParser from "cookie-parser";
-import { logoutAccount } from "./endpoints/accounts/logoutAccount.js";
-import { getInfoAccount } from "./endpoints/accounts/infoAccount.js";
 import countersRouter from "./endpoints/counters/countersRouter.js";
-import { auth } from "./infrastructure/middleware/authMiddleware.js"
 import accountsRouter from "./endpoints/accounts/accountsRouter.js";
+import authRouter from "./endpoints/auth/authRouter.js";
 
 const app = express();
 
@@ -50,10 +46,7 @@ app.get("/db-test", async (req, res) => {
   res.json({ version: version, time: time });
 });
 
-app.post("/auth/login", loginAccount);
-app.get("/auth/logout", logoutAccount);
-app.get("/auth/me", auth, getInfoAccount);
-
+app.use("/auth", authRouter)
 app.use("/accounts", accountsRouter);
 app.use("/counters", countersRouter);
 

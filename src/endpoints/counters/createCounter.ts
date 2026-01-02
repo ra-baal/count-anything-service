@@ -7,6 +7,12 @@ const requestModel = zod.object({
 });
 
 export async function createCounter(req: Request, res: Response) {
+  //Get userId from request
+  const { userId } = req;
+
+  if (typeof(userId) === "undefined")
+    return res.status(500).json({ error: "Internal pipeline error" });
+
   const result = requestModel.safeParse(req.body);
   if (!result.success) {
     return res.status(400).json("Name is required");
@@ -14,7 +20,7 @@ export async function createCounter(req: Request, res: Response) {
   const { name } = result.data;
 
   try {
-    const counter = await counterQueries.create(name);
+    const counter = await counterQueries.create(name, userId);
 
     res.status(201).json(counter);
   } catch (error) {
