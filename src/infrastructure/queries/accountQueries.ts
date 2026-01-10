@@ -1,3 +1,4 @@
+import { dropAccount } from "../../api/endpoints/accounts/dropAccount.js";
 import { sql } from "../database.js";
 
 type AccountInfoModel = {
@@ -27,7 +28,7 @@ async function getLoginCredential(email: string): Promise<string[]> {
   const [result] = await sql`
     SELECT pass.accountid, pass.hashedvalue FROM accounts
       JOIN passwords AS pass ON accounts.id = pass.accountid
-      WHERE email = ${email}
+      WHERE email = ${email} AND isactive = ${true}
       FETCH FIRST 1 ROWS ONLY;`;
 
   if (result == null) throw new Error("empty");
@@ -43,8 +44,22 @@ async function getAccountInfo(email: string): Promise<AccountInfoModel> {
   return result as AccountInfoModel;
 }
 
+async function setNewEmail(email: string, userId: string) {
+  await sql`
+    UPDATE accounts SET email = ${email}, editeddate = NOW()
+    WHERE id = ${userId};`;
+}
+
+async function inactiveAccount(userId: string) {
+  await sql`
+  UPDATE accounts SET isactive = ${false}, inactivedate = NOW()
+  WHERE id = ${userId};`;
+}
+
 export const accountQueries = {
   register: insertAccount,
   login: getLoginCredential,
-  info: getAccountInfo
+  info: getAccountInfo,
+  changeEmail: setNewEmail,
+  dropAccount: inactiveAccount
 };
