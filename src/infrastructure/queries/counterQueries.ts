@@ -1,4 +1,4 @@
-import { Counter } from "../../common/counter.js";
+import { Counter, CounterEvents } from "../../common/counter.js";
 import { sql } from "../database.js";
 
 type CounterId = { id: string };
@@ -9,6 +9,9 @@ async function createCounter(name: string, userId: string): Promise<Counter> {
     VALUES (${name}, 0, ${userId})
     RETURNING id, name, value, accountid
   `) as Counter[];
+  await sql`
+    INSERT INTO counter_events (eventdate, counterid, value)
+    VALUES (now(), ${counter.id}, ${counter.value})`;
   return counter;
 }
 
@@ -19,6 +22,9 @@ async function decrementCounter(id: string, userId: string): Promise<Counter> {
     WHERE id = ${id} AND accountid = ${userId}
     RETURNING *
   `) as Counter[];
+  await sql`
+    INSERT INTO counter_events (eventdate, counterid, value)
+    VALUES (now(), ${updatedCounter.id}, ${updatedCounter.value})`;
   return updatedCounter;
 }
 
@@ -28,6 +34,9 @@ async function deleteCounter(id: string, userId: string): Promise<CounterId> {
     WHERE id = ${id} AND accountid = ${userId}
     RETURNING id
   `) as CounterId[];
+  await sql`
+  DELETE FROM counter_events
+  WHERE counterid = ${deleted.id}`;
   return deleted;
 }
 
@@ -46,6 +55,9 @@ async function incrementCounter(id: string, userId: string): Promise<Counter> {
     WHERE id = ${id} AND accountid = ${userId}
     RETURNING *
   `) as Counter[];
+  await sql`
+    INSERT INTO counter_events (eventdate, counterid, value)
+    VALUES (now(), ${updatedCounter.id}, ${updatedCounter.value})`;
   return updatedCounter;
 }
 
@@ -56,7 +68,18 @@ async function resetCounter(id: string, userId: string): Promise<Counter> {
     WHERE id = ${id} AND accountid = ${userId}
     RETURNING *
   `) as Counter[];
+  await sql`
+    INSERT INTO counter_events (eventdate, counterid, value)
+    VALUES (now(), ${resetedCounter.id}, ${resetedCounter.value})`;
   return resetedCounter;
+}
+
+async function getCounterDetail(id: string): Promise<CounterEvents> {
+  const [counterDetail] = (await sql`
+    SELECT TOP 50 * FROM counter_events
+    WHERE counterid = ${id} ORDER BY eventdate DESC
+    `) as CounterEvents[];
+  return counterDetail;
 }
 
 export const counterQueries = {
@@ -66,4 +89,5 @@ export const counterQueries = {
   getAll: getCounters,
   increment: incrementCounter,
   reset: resetCounter,
+  detail: getCounterDetail
 };

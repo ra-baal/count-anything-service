@@ -4,3 +4,9 @@ export type Counter = {
   value: number;
   userId: number
 };
+
+export type CounterEvents = {
+  counterid: string;
+  eventdate: string,
+  value: number
+};
