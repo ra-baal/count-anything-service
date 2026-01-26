@@ -6,7 +6,7 @@ export async function detailCounters(req: Request, res: Response) {
   const { id } = req.params;
 
   try {
-    const detail: CounterEvents = await counterQueries.detail(id);
+    const detail: CounterEvents[] = await counterQueries.detail(id);
 
     return res.json(detail);
   } catch (error) {

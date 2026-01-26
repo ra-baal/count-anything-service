@@ -74,12 +74,12 @@ async function resetCounter(id: string, userId: string): Promise<Counter> {
   return resetedCounter;
 }
 
-async function getCounterDetail(id: string): Promise<CounterEvents> {
-  const [counterDetail] = (await sql`
-    SELECT TOP 50 * FROM counter_events
+async function getCounterDetail(id: string): Promise<CounterEvents[]> {
+  return (await sql`
+    SELECT * FROM counter_events
     WHERE counterid = ${id} ORDER BY eventdate DESC
+    LIMIT 50
     `) as CounterEvents[];
-  return counterDetail;
 }
 
 export const counterQueries = {
