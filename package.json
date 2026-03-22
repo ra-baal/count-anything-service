@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "dev": "tsc --noEmit && node --loader ts-node/esm src/index.ts",
+    "dev": "nodemon --ext ts --exec \"tsc --noEmit && node --loader ts-node/esm\" src/index.ts",
     "vercel-dev": "vercel dev",
     "build": "tsc"
   },
@@ -20,6 +20,8 @@
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.3",
+    "nodemon": "^3.1.14",
+    "resend": "^6.9.4",
     "zod": "^4.1.13"
   },
   "devDependencies": {
