@@ -6,6 +6,7 @@ import { z } from "zod";
 import { Resend } from "resend";
 import { accountQueries } from "../../../../infrastructure/queries/accountQueries.js";
 import { passwordResetQueries } from "../../../../infrastructure/queries/passwordResetQueries.js";
+import { assertDefined } from "../../../../common/helpers.js";
 
 const passwordResetRequestSchema = z.object({
   email: z
@@ -15,15 +16,14 @@ const passwordResetRequestSchema = z.object({
 });
 
 dotenv.config({ path: ".env.development.local" });
-if (!process.env.RESEND_API_KEY) {
-  throw new Error("Missing RESEND_API_KEY");
-}
-const resend = new Resend(process.env.RESEND_API_KEY);
 
-if (!process.env.FRONTEND_URL) {
-  throw new Error("Missing FRONTEND_URL");
-}
-const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+const resend = new Resend(
+  assertDefined(process.env.RESEND_API_KEY, "RESEND_API_KEY"),
+);
+
+const frontendUrl = assertDefined(process.env.FRONTEND_URL, "FRONTEND_URL");
+
+const emailFrom = assertDefined(process.env.EMAIL_FROM, "Missing EMAIL_FROM");
 
 export default async function requestPasswordReset(
   req: Request,
@@ -68,7 +68,7 @@ export default async function requestPasswordReset(
       const resetLink = `${frontendUrl}/account/password-reset/${tokenId}.${token}`;
 
       const { data, error } = await resend.emails.send({
-        from: "Acme <onboarding@resend.dev>", // Change for verified domain in the future
+        from: emailFrom,
         to: [email],
         subject: "Resetowanie hasła",
         html: `
