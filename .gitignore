@@ -33,3 +33,5 @@ Thumbs.db
 
 # misc
 *.swp
+
+/src/generated/prisma

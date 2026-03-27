@@ -1,11 +1,43 @@
 import { dropAccount } from "../../api/endpoints/accounts/dropAccount.js";
-import { sql } from "../database.js";
+import { sql, prisma } from "../database.js";
 
 type AccountInfoModel = {
   id: string,
   email: string,
   creationdate: string
 };
+
+/**
+ * Save user object in DB
+ * @param email user's email
+ * @param passwordHash user's password hashed Argon2
+ */
+async function insertAccountPrisma(email: string, passwordHash: string) {
+  const createObjFn = async () => {
+    //Create new object in DB
+    const prismaObj = await prisma.account.create({
+      data: {
+        email: email,
+          password: {
+          create: {
+            hashedValue: passwordHash
+          }
+        }
+      },
+      include: {
+        password: true
+      }
+    });
+  }
+
+  createObjFn().then(async () => {
+    await prisma.$disconnect();
+  }).catch(async (e) => {
+    console.error(e);
+    await prisma.$disconnect();
+    throw e;
+  })
+}
 
 async function insertAccount(email: string, passwordHash: string) {
   // W srodowisku serverless nie mozna polegac na tradycyjnych transakcjach,
@@ -63,3 +95,7 @@ export const accountQueries = {
   changeEmail: setNewEmail,
   dropAccount: inactiveAccount
 };
+
+export const accountQueriesPrisma = {
+  register: insertAccountPrisma
+}
