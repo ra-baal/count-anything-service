@@ -9,7 +9,6 @@ export default defineConfig({
     path: "./prisma/migrations",
   },
   datasource: {
-    // url: process.env.COUNT_ANYTHING_DB_DIRECT_URL,
-    url: "DIRECT_URL",
+    url: process.env.COUNT_ANYTHING_DB_DIRECT_URL
   },
 });

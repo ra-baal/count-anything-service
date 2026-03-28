@@ -1,4 +1,5 @@
 import { dropAccount } from "../../api/endpoints/accounts/dropAccount.js";
+import { Prisma } from "../../generated/prisma/client.js";
 import { sql, prisma } from "../database.js";
 
 type AccountInfoModel = {
@@ -7,13 +8,15 @@ type AccountInfoModel = {
   creationdate: string
 };
 
+type LoginCredentialModel = Prisma.AccountGetPayload<{ select: { id: true; email: true; password: { select: { hashedValue: true }}}}>;
+
 /**
  * Save user object in DB
  * @param email user's email
  * @param passwordHash user's password hashed Argon2
  */
 async function insertAccountPrisma(email: string, passwordHash: string) {
-  const createObjFn = async () => {
+  try {
     //Create new object in DB
     const prismaObj = await prisma.account.create({
       data: {
@@ -28,15 +31,28 @@ async function insertAccountPrisma(email: string, passwordHash: string) {
         password: true
       }
     });
+  } finally {
+    await prisma.$disconnect();
   }
+}
 
-  createObjFn().then(async () => {
+/**
+ * Get account object from DB where emails equals given as argument and is active.
+ * When doesn't find any object return null
+ * @param email user's email
+ * @returns User object in DB with password object
+ */
+async function getLoginCredentialPrisma(email: string): Promise<LoginCredentialModel | null> {
+  try {
+    //Get account object from DB where email equals and isActive = true
+    const prismaObj = await prisma.account.findFirst({
+      where: { email: email, isActive: true },
+      select: { id: true, email: true, password: { select: { hashedValue: true }}}
+    });
+    return prismaObj;
+  } finally {
     await prisma.$disconnect();
-  }).catch(async (e) => {
-    console.error(e);
-    await prisma.$disconnect();
-    throw e;
-  })
+  }
 }
 
 async function insertAccount(email: string, passwordHash: string) {
@@ -97,5 +113,6 @@ export const accountQueries = {
 };
 
 export const accountQueriesPrisma = {
-  register: insertAccountPrisma
+  register: insertAccountPrisma,
+  login: getLoginCredentialPrisma
 }
