@@ -6,7 +6,7 @@ import accountsRouter from "./api/endpoints/accounts/accountsRouter.js";
 import authRouter from "./api/endpoints/auth/authRouter.js";
 import { corsMiddleware } from "./api/middleware/corsMiddleware.js";
 
-const isLocal = process.env.NODE_ENV === "development";
+const isDevelopment = process.env.NODE_ENV === "development";
 const isVercel = process.env.VERCEL === "1";
 
 console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
@@ -50,7 +50,7 @@ function run(a: express.Express) {
     const port = process.env.PORT || 3000;
 
     const server = a.listen(port, () => {
-      if (isLocal) {
+      if (isDevelopment) {
         console.log(`Server running at http://localhost:${port}`);
       } else {
         console.log(`Server running on port ${port}`);
