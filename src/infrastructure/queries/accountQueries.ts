@@ -1,5 +1,6 @@
 import { dropAccount } from "../../api/endpoints/accounts/dropAccount.js";
-import { sql } from "../database.js";
+import { Account, Prisma } from "../../generated/prisma/client.js";
+import { sql, prisma } from "../database.js";
 
 type AccountInfoModel = {
   id: string,
@@ -7,6 +8,117 @@ type AccountInfoModel = {
   creationdate: string
 };
 
+type LoginCredentialModel = Prisma.AccountGetPayload<{ select: { id: true; email: true; password: { select: { hashedValue: true }}}}>;
+
+/**
+ * Save user object in DB
+ * @param email user's email
+ * @param passwordHash user's password hashed Argon2
+ */
+async function insertAccountPrisma(email: string, passwordHash: string) {
+  try {
+    //Create new object in DB
+    const prismaObj = await prisma.account.create({
+      data: {
+        email: email,
+          password: {
+          create: {
+            hashedValue: passwordHash
+          }
+        }
+      },
+      include: {
+        password: true
+      }
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+/**
+ * Get account object from DB where emails equals given as argument and is active.
+ * When doesn't find any object return null
+ * @param email user's email
+ * @returns User object in DB with password object
+ */
+async function getLoginCredentialPrisma(email: string): Promise<LoginCredentialModel | null> {
+  try {
+    //Get account object from DB where email equals and isActive = true
+    const prismaObj = await prisma.account.findFirst({
+      where: { email: email, isActive: true },
+      select: { id: true, email: true, password: { select: { hashedValue: true }}}
+    });
+    return prismaObj;
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+/**
+ * Get account object from DB where emails equals given as argument
+ * When doesn't find any object return null
+ * @param email user's email
+ * @returns User object in DB
+ */
+async function getAccountPrisma(email: string): Promise<Account | null> {
+  try {
+    //Get account object from DB where email equals
+    const prismaObj = await prisma.account.findFirst({
+      where: { email: email }
+    });
+    return prismaObj;
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+/**
+ * Update on DB side email for account object with id equals given
+ * @param email New email
+ * @param userId User id
+ */
+async function setNewEmailPrisma(email: string, userId: number) {
+  try {
+    //Update email field in DB for Account object with given ID
+    const prismaObj = await prisma.account.update({
+      where: { id: userId },
+      data: { email: email }
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+/**
+ * Remove account objects from DB and password object that has relation with to removed account object.
+ * @param userId User id
+ */
+async function deleteAccountPrisma(userId: number) {
+  try {
+    //Remove account object from DB and any object that has relation with object
+    const deletePassword = prisma.password.delete({
+      where: { accountId: userId }
+    });
+    const deleteAccount = prisma.account.delete({
+      where: { id: userId }
+    });
+
+    const prismaObj = await prisma.$transaction([deletePassword, deleteAccount]);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export const accountQueriesPrisma = {
+  register: insertAccountPrisma,
+  login: getLoginCredentialPrisma,
+  info: getAccountPrisma,
+  changeEmail: setNewEmailPrisma,
+  dropAccount: deleteAccountPrisma
+}
+
+//#region Old Version
 async function insertAccount(email: string, passwordHash: string) {
   // W srodowisku serverless nie mozna polegac na tradycyjnych transakcjach,
   // dlatego uzywamy jednego atomowego zapytania, ktore tworzy konto i haslo w spojny sposob.
@@ -63,3 +175,5 @@ export const accountQueries = {
   changeEmail: setNewEmail,
   dropAccount: inactiveAccount
 };
+
+//#endregion

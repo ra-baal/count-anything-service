@@ -1,0 +1,27 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Account {
+  id Int @id @default(autoincrement())
+  email String @unique
+  isActive Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  inactiveAt DateTime?
+
+  password Password?
+}
+
+model Password {
+  accountId Int @id
+  hashedValue String
+  updatedAt DateTime @updatedAt
+
+  account Account @relation(fields: [accountId], references: [id])
+}

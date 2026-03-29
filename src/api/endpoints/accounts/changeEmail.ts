@@ -1,7 +1,7 @@
-import { NeonDbError } from "@neondatabase/serverless";
 import { Request, Response } from "express";
 import z from "zod";
-import { accountQueries } from "../../../infrastructure/queries/accountQueries.js";
+import { accountQueriesPrisma } from "../../../infrastructure/queries/accountQueries.js";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 
 declare global {
   namespace Express {
@@ -19,6 +19,12 @@ const BodyModel = z.object({
 });
 type BodyModelType = z.infer<typeof BodyModel>;
 
+/**
+ * Endpoint function to change email of current log in user
+ * @param req Request Object
+ * @param res Response Object
+ * @returns Ready to use response object
+ */
 export async function changeEmail(req: Request, res: Response) {
     //Validate data
     const result = BodyModel.safeParse(req.body);
@@ -28,14 +34,14 @@ export async function changeEmail(req: Request, res: Response) {
     });
   }
   const data: BodyModelType = result.data;
-  const userId = req.userId ?? ""; //UserId zawsze bedzie mialo wartosc
+  const userId = Number(req.userId ?? "0"); //UserId zawsze bedzie mialo wartosc
 
   try {
     //Push to DB
-    await accountQueries.changeEmail(data.email, userId);
+    await accountQueriesPrisma.changeEmail(data.email, userId);
     return res.status(200).json({ success: true });
   } catch(err) {
-       if (err instanceof NeonDbError)
+       if (err instanceof PrismaClientKnownRequestError)
           return res.status(500).json({ error: dbError });
       else throw err;
   }

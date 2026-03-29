@@ -1,8 +1,8 @@
 import type { Request, Response } from "express";
-import { NeonDbError } from "@neondatabase/serverless";
-import { accountQueries } from "../../../infrastructure/queries/accountQueries.js";
+import { accountQueriesPrisma } from "../../../infrastructure/queries/accountQueries.js";
 import { hash } from "argon2";
 import { z } from "zod";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 
 const invalidRequestError =
   "Invalid request body. Expected: { email: string, password: string }";
@@ -26,6 +26,13 @@ const AccountModel = z.object({
 
 type CreateAccountModel = z.infer<typeof AccountModel>;
 
+/**
+ * Endpoint Function to Handle Register Account.
+ * Save user data to DB.
+ * @param req Request Object
+ * @param res Response Object
+ * @returns Configured Response Object
+ */
 export async function registerAccount(req: Request, res: Response) {
   //Validate data
   const result = AccountModel.safeParse(req.body);
@@ -42,13 +49,13 @@ export async function registerAccount(req: Request, res: Response) {
     newAccount.password = await hash(newAccount.password);
 
     //Push to DB
-    const accountId = await accountQueries.register(
+    const accountId = await accountQueriesPrisma.register(
       newAccount.email,
       newAccount.password
     );
     return res.status(200).json({ id: accountId });
   } catch (err) {
-    if (err instanceof NeonDbError)
+    if (err instanceof PrismaClientKnownRequestError)
       return res.status(500).json({ error: dbError });
     else throw err;
   }
