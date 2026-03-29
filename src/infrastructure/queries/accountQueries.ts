@@ -1,3 +1,4 @@
+import { dropAccount } from "../../api/endpoints/accounts/dropAccount.js";
 import { Account, Prisma } from "../../generated/prisma/client.js";
 import { sql, prisma } from "../database.js";
 
@@ -89,6 +90,35 @@ async function setNewEmailPrisma(email: string, userId: number) {
   }
 }
 
+/**
+ * Remove account objects from DB and password object that has relation with to removed account object.
+ * @param userId User id
+ */
+async function deleteAccountPrisma(userId: number) {
+  try {
+    //Remove account object from DB and any object that has relation with object
+    const deletePassword = prisma.password.delete({
+      where: { accountId: userId }
+    });
+    const deleteAccount = prisma.account.delete({
+      where: { id: userId }
+    });
+
+    const prismaObj = await prisma.$transaction([deletePassword, deleteAccount]);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export const accountQueriesPrisma = {
+  register: insertAccountPrisma,
+  login: getLoginCredentialPrisma,
+  info: getAccountPrisma,
+  changeEmail: setNewEmailPrisma,
+  dropAccount: deleteAccountPrisma
+}
+
+//#region Old Version
 async function insertAccount(email: string, passwordHash: string) {
   // W srodowisku serverless nie mozna polegac na tradycyjnych transakcjach,
   // dlatego uzywamy jednego atomowego zapytania, ktore tworzy konto i haslo w spojny sposob.
@@ -146,9 +176,4 @@ export const accountQueries = {
   dropAccount: inactiveAccount
 };
 
-export const accountQueriesPrisma = {
-  register: insertAccountPrisma,
-  login: getLoginCredentialPrisma,
-  info: getAccountPrisma,
-  changeEmail: setNewEmailPrisma
-}
+//#endregion
