@@ -1,0 +1,11 @@
+{
+  "window.title": "${rootName}${separator}${activeEditorShort}",
+  "workbench.colorCustomizations": {
+    // "activityBar.background": "#1e2127",
+    // "activityBar.foreground": "#95C085",
+    "titleBar.activeBackground": "#000745"
+    // "titleBar.activeForeground": "#f00000"
+  },
+  "appService.defaultWebAppToDeploy": "/subscriptions/06c9a0d3-616f-40b3-b936-b45a65e0c6dc/resourceGroups/countanything-prod/providers/Microsoft.Web/sites/as-countanything-prod",
+  "appService.deploySubpath": "."
+}

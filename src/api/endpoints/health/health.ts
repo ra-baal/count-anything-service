@@ -1,5 +1,7 @@
 import type { Request, Response } from "express";
 import { dbTime } from "../../../infrastructure/queries/systemQueries.js";
+import pkg from "../../../../package.json" with { type: "json" };
+import { env } from "process";
 
 export async function health(req: Request, res: Response): Promise<Response> {
   let dbOk: boolean = false;
@@ -13,17 +15,15 @@ export async function health(req: Request, res: Response): Promise<Response> {
     dbOk = false;
   }
 
-  const lines: string[] = [
-    "Service: OK",
-    `Database: ${dbOk ? "OK" : "ERROR"}`,
-    `Server time: ${new Date().toISOString()}`,
-    `Database time: ${dbTimeIso ?? "N/A"}`,
-  ];
+  const obj = {
+    env: env.NODE_ENV,
+    name: pkg.name,
+    version: pkg.version,
+    service: true ? "working" : "error",
+    database: dbOk ? "working" : "error",
+    serverTime: new Date().toISOString(),
+    databaseTime: dbTimeIso,
+  };
 
-  const body: string = lines.join("\n");
-
-  return res
-    .status(dbOk ? 200 : 503)
-    .type("text/plain")
-    .send(body);
+  return res.status(dbOk ? 200 : 503).json(obj);
 }
