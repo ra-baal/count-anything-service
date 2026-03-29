@@ -13,6 +13,14 @@ declare global {
 const noTokenError = "Access denied! No token provided";
 const invalidToken = "Invalid token";
 
+/**
+ * Try open jwt token.
+ * When success return its content.
+ * When failed return string object with custom error message to send back.
+ * @param req Request Object
+ * @param res Response Object
+ * @returns Payload in JWT token
+ */
 function authUser(req: Request, res: Response): string | jwt.JwtPayload {
   //Get token from cookies
   const { access_token } = req.cookies;
@@ -28,6 +36,14 @@ function authUser(req: Request, res: Response): string | jwt.JwtPayload {
   }
 }
 
+/**
+ * Middleware function to check if user are logged in.
+ * Store user id in request object and send to the next function in pipeline.
+ * @param req Request Object
+ * @param res Response Object
+ * @param next Next Object
+ * @returns If error message back to user
+ */
 export function auth(req: Request, res: Response, next: NextFunction) {
   const authResult = authUser(req, res);
 

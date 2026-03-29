@@ -1,4 +1,3 @@
-import { dropAccount } from "../../api/endpoints/accounts/dropAccount.js";
 import { Account, Prisma } from "../../generated/prisma/client.js";
 import { sql, prisma } from "../database.js";
 
@@ -73,6 +72,23 @@ async function getAccountPrisma(email: string): Promise<Account | null> {
   }
 }
 
+/**
+ * Update on DB side email for account object with id equals given
+ * @param email New email
+ * @param userId User id
+ */
+async function setNewEmailPrisma(email: string, userId: number) {
+  try {
+    //Update email field in DB for Account object with given ID
+    const prismaObj = await prisma.account.update({
+      where: { id: userId },
+      data: { email: email }
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
 async function insertAccount(email: string, passwordHash: string) {
   // W srodowisku serverless nie mozna polegac na tradycyjnych transakcjach,
   // dlatego uzywamy jednego atomowego zapytania, ktore tworzy konto i haslo w spojny sposob.
@@ -133,5 +149,6 @@ export const accountQueries = {
 export const accountQueriesPrisma = {
   register: insertAccountPrisma,
   login: getLoginCredentialPrisma,
-  info: getAccountPrisma
+  info: getAccountPrisma,
+  changeEmail: setNewEmailPrisma
 }
