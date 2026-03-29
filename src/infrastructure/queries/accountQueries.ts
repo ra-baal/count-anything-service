@@ -1,5 +1,5 @@
 import { dropAccount } from "../../api/endpoints/accounts/dropAccount.js";
-import { Prisma } from "../../generated/prisma/client.js";
+import { Account, Prisma } from "../../generated/prisma/client.js";
 import { sql, prisma } from "../database.js";
 
 type AccountInfoModel = {
@@ -48,6 +48,24 @@ async function getLoginCredentialPrisma(email: string): Promise<LoginCredentialM
     const prismaObj = await prisma.account.findFirst({
       where: { email: email, isActive: true },
       select: { id: true, email: true, password: { select: { hashedValue: true }}}
+    });
+    return prismaObj;
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+/**
+ * Get account object from DB where emails equals given as argument
+ * When doesn't find any object return null
+ * @param email user's email
+ * @returns User object in DB
+ */
+async function getAccountPrisma(email: string): Promise<Account | null> {
+  try {
+    //Get account object from DB where email equals
+    const prismaObj = await prisma.account.findFirst({
+      where: { email: email }
     });
     return prismaObj;
   } finally {
@@ -114,5 +132,6 @@ export const accountQueries = {
 
 export const accountQueriesPrisma = {
   register: insertAccountPrisma,
-  login: getLoginCredentialPrisma
+  login: getLoginCredentialPrisma,
+  info: getAccountPrisma
 }
