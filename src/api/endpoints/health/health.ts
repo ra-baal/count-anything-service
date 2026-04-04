@@ -1,29 +1,37 @@
 import type { Request, Response } from "express";
-import { dbTime } from "../../../infrastructure/queries/systemQueries.js";
+import {
+  dbTime,
+  dbVersion,
+} from "../../../infrastructure/queries/systemQueries.js";
+import pkg from "../../../../package.json" with { type: "json" };
+import { env } from "process";
 
 export async function health(req: Request, res: Response): Promise<Response> {
   let dbOk: boolean = false;
   let dbTimeIso: string | null = null;
+  let dbVer: string | null = null;
 
   try {
     const dbTimeValue: Date = await dbTime();
+    dbVer = await dbVersion();
     dbOk = true;
     dbTimeIso = dbTimeValue.toISOString();
   } catch {
     dbOk = false;
   }
 
-  const lines: string[] = [
-    "Service: OK",
-    `Database: ${dbOk ? "OK" : "ERROR"}`,
-    `Server time: ${new Date().toISOString()}`,
-    `Database time: ${dbTimeIso ?? "N/A"}`,
-  ];
+  const obj = {
+    env: env.NODE_ENV,
+    name: pkg.name,
+    version: pkg.version,
+    status: true ? "working" : "error",
+    time: new Date().toISOString(),
+    database: {
+      status: dbOk ? "working" : "error",
+      version: dbVer,
+      time: dbTimeIso,
+    },
+  };
 
-  const body: string = lines.join("\n");
-
-  return res
-    .status(dbOk ? 200 : 503)
-    .type("text/plain")
-    .send(body);
+  return res.json(obj);
 }

@@ -1,35 +1,35 @@
 {
-  "name": "express",
-  "version": "1.0.0",
-  "description": "",
+  "name": "count-anything-service",
+  "version": "2026.3.29",
+  "private": true,
+  "type": "module",
   "scripts": {
     "dev": "nodemon --ext ts --exec \"tsc --noEmit && node --loader ts-node/esm\" src/index.ts",
-    "vercel-dev": "vercel dev",
-    "build": "tsc"
+    "build": "tsc",
+    "start": "node dist/index.js"
   },
-  "type": "module",
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
-    "@types/express": "^5.0.0",
     "argon2": "^0.44.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.3",
-    "nodemon": "^3.1.14",
     "resend": "^6.9.4",
     "zod": "^4.1.13"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.0.0",
+    "nodemon": "^3.1.14",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
