@@ -8,3 +8,13 @@ export function assertDefined<T>(
 
   return value;
 }
+
+export function maskEverySecondChar(input: string): string {
+  let result = "";
+
+  for (let i = 0; i < input.length; i++) {
+    result += i % 2 === 1 ? "*" : input[i];
+  }
+
+  return result;
+}

@@ -17,13 +17,11 @@ const passwordResetRequestSchema = z.object({
 
 dotenv.config({ path: ".env.development.local" });
 
-const resend = new Resend(
-  assertDefined(process.env.RESEND_API_KEY, "RESEND_API_KEY"),
-);
+const resend = new Resend(process.env.RESEND_API_KEY ?? "");
 
-const frontendUrl = assertDefined(process.env.FRONTEND_URL, "FRONTEND_URL");
+const frontendUrl = process.env.FRONTEND_URL ?? "";
 
-const emailFrom = assertDefined(process.env.EMAIL_FROM, "Missing EMAIL_FROM");
+const emailFrom = process.env.EMAIL_FROM ?? "";
 
 export default async function requestPasswordReset(
   req: Request,

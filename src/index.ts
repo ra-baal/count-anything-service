@@ -5,11 +5,16 @@ import countersRouter from "./api/endpoints/counters/countersRouter.js";
 import accountsRouter from "./api/endpoints/accounts/accountsRouter.js";
 import authRouter from "./api/endpoints/auth/authRouter.js";
 import { corsMiddleware } from "./api/middleware/corsMiddleware.js";
+import { maskEverySecondChar } from "./common/helpers.js";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 const isVercel = process.env.VERCEL === "1";
 
 console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+
+console.log(
+  `(1) NODE_ENV: ${maskEverySecondChar(process.env.COUNT_ANYTHING_DB_DATABASE_URL ?? "")}`,
+);
 
 const app = setup();
 
